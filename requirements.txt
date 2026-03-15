@@ -1,0 +1,6 @@
+Flask==2.3.2
+pandas==2.1.0
+numpy==1.26.0
+scikit-learn==1.3.0   # Provides RandomForestRegressor
+joblib==1.3.2         # For saving/loading the model
+gunicorn==21.2.0      # Production server for deployment
