@@ -62,10 +62,6 @@ def send_fraud_alert(record, receiver_email):
         print("Email send failed:", e)
         return False
 
-@app.route("/")
-def landing():
-    return render_template("landing.html")  # Shows 3 main cards
-
 @app.route("/about")
 def about():
     return render_template("about.html")
