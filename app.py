@@ -14,10 +14,9 @@ load_dotenv()
 EMAIL_USER = os.getenv("EMAIL_USER")
 EMAIL_PASS = os.getenv("EMAIL_PASS")
 MODEL_PATH = os.getenv("MODEL_PATH", "fraud_detection_model.pkl")
-SECRET_KEY = os.getenv("SECRET_KEY", "fraud_secret_key")
 
 app = Flask(__name__)
-app.secret_key = SECRET_KEY
+app.secret_key = "fraud_secret_key"  # Minimal secret for session handling
 
 # Load ML model
 model = joblib.load(MODEL_PATH)
@@ -54,12 +53,21 @@ def send_fraud_alert(record, receiver_email):
         msg["To"] = receiver_email
         msg.attach(MIMEText(body, "html"))
 
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-            server.login(EMAIL_USER, EMAIL_PASS)
-            server.sendmail(EMAIL_USER, receiver_email, msg.as_string())
-        return True
+        # Safe email sending with exception handling
+        try:
+            with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=10) as server:
+                server.login(EMAIL_USER, EMAIL_PASS)
+                server.sendmail(EMAIL_USER, receiver_email, msg.as_string())
+            return True
+        except smtplib.SMTPException as e:
+            print("SMTP error:", e)
+            return False
+        except Exception as e:
+            print("Email send failed:", e)
+            return False
+
     except Exception as e:
-        print("Email send failed:", e)
+        print("Unexpected error in send_fraud_alert:", e)
         return False
 
 # Root points to About page
