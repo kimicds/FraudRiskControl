@@ -14,15 +14,15 @@ load_dotenv()
 EMAIL_USER = os.getenv("EMAIL_USER")
 EMAIL_PASS = os.getenv("EMAIL_PASS")
 MODEL_PATH = os.getenv("MODEL_PATH", "fraud_detection_model.pkl")
+SECRET_KEY = os.getenv("SECRET_KEY", "fraud_secret_key")
 
 app = Flask(__name__)
-app.secret_key = os.getenv("SECRET_KEY", "fraud_secret_key")
+app.secret_key = SECRET_KEY
 
 # Load ML model
 model = joblib.load(MODEL_PATH)
 
 def is_valid_email(email):
-    # Basic regex to check if email is valid
     regex = r'^[\w\.-]+@[\w\.-]+\.\w+$'
     return re.match(regex, email) is not None
 
@@ -62,6 +62,8 @@ def send_fraud_alert(record, receiver_email):
         print("Email send failed:", e)
         return False
 
+# Root points to About page
+@app.route("/")
 @app.route("/about")
 def about():
     return render_template("about.html")
@@ -69,10 +71,8 @@ def about():
 @app.route("/data-entry", methods=["GET", "POST"])
 def data_entry():
     if request.method == "POST":
-        # Capture location or default to "Unknown"
         sender_location = request.form.get("sender_location", "Unknown") or "Unknown"
 
-        # Get transaction data
         data = {
             "transaction_hour": int(request.form["transaction_hour"]),
             "transaction_amount": float(request.form["transaction_amount"]),
@@ -85,12 +85,12 @@ def data_entry():
             "sender_location": sender_location
         }
 
-        # Validate sender balance
+        # Validate balance
         if data["transaction_amount"] > data["sender_balance_before"]:
             flash("Error: Sender balance is insufficient for this transaction.", "danger")
             return redirect(url_for("data_entry"))
 
-        # Validate investigator email format
+        # Validate investigator email
         if not is_valid_email(data["investigator_email"]):
             flash("Error: Investigator email is invalid.", "danger")
             return redirect(url_for("data_entry"))
@@ -107,11 +107,9 @@ def predict():
         flash("No transaction data found. Please enter transaction details first.", "warning")
         return redirect(url_for("data_entry"))
 
-    # Compute balances after transaction
     origin_balance_after = data["sender_balance_before"] - data["transaction_amount"]
     destination_balance_after = data["receiver_balance_before"] + data["transaction_amount"]
 
-    # One-hot encode transaction type
     tx = {t: 0 for t in ["CASH_IN", "CASH_OUT", "DEBIT", "PAYMENT", "TRANSFER"]}
     tx[data["transaction_type"]] = 1
 
@@ -132,7 +130,6 @@ def predict():
     prediction = int(model.predict(X)[0])
     result = "Fraud" if prediction == 1 else "Not Fraud"
 
-    # Handle email alert
     email_status_message = None
     if result == "Fraud":
         if is_valid_email(data["investigator_email"]):
@@ -144,7 +141,6 @@ def predict():
         else:
             email_status_message = "Fraud detected but investigator email is invalid!"
 
-    # Store balances for display
     data["origin_balance_after"] = origin_balance_after
     data["destination_balance_after"] = destination_balance_after
 
@@ -152,4 +148,5 @@ def predict():
     return render_template("predict.html", result=result, alert_message=email_status_message, data=data)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=True)
