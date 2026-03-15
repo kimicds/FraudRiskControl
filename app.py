@@ -19,7 +19,7 @@ app = Flask(__name__)
 app.secret_key = "fraud_secret_key"  # Minimal secret for session handling
 
 # Load ML model
-model = joblib.load(MODEL_PATH)
+model = joblib.load("fraud_detection_model.pkl")
 
 def is_valid_email(email):
     regex = r'^[\w\.-]+@[\w\.-]+\.\w+$'
