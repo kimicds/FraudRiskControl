@@ -11,8 +11,8 @@ import datetime
 
 load_dotenv()
 
-EMAIL_USER = os.getenv("EMAIL_USER")
-EMAIL_PASS = os.getenv("EMAIL_PASS")
+EMAIL_USER = os.getenv("akimuodunola@gmail.com")
+EMAIL_PASS = os.getenv("ezizemqmwhibutpw")
 MODEL_PATH = os.getenv("MODEL_PATH", "fraud_detection_model.pkl")
 
 app = Flask(__name__)
