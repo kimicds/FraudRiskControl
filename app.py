@@ -11,12 +11,12 @@ import datetime
 
 load_dotenv()
 
-EMAIL_USER = os.getenv("akimuodunola@gmail.com")
-EMAIL_PASS = os.getenv("ezizemqmwhibutpw")
-MODEL_PATH = os.getenv("MODEL_PATH", "fraud_detection_model.pkl")
+EMAIL_USER = "akimuodunola@gmail.com"
+EMAIL_PASS = "ezizemqmwhibutpw"
+MODEL_PATH = "fraud_detection_model.pkl"
 
 app = Flask(__name__)
-app.secret_key = "fraud_secret_key"  # Minimal secret for session handling
+#app.secret_key = "fraud_secret_key"  # Minimal secret for session handling
 
 # Load ML model
 model = joblib.load("fraud_detection_model.pkl")
@@ -55,7 +55,7 @@ def send_fraud_alert(record, receiver_email):
 
         # Safe email sending with exception handling
         try:
-            with smtplib.SMTP("smtp.gmail.com", 587, timeout=15) as server:
+            with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
                 server.login(EMAIL_USER, EMAIL_PASS)
                 server.sendmail(EMAIL_USER, receiver_email, msg.as_string())
             return True
