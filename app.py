@@ -16,7 +16,7 @@ EMAIL_PASS = "ezizemqmwhibutpw"
 MODEL_PATH = "fraud_detection_model.pkl"
 
 app = Flask(__name__)
-#app.secret_key = "fraud_secret_key"  # Minimal secret for session handling
+app.secret_key = "fraud_secret_key"  # Minimal secret for session handling
 
 # Load ML model
 model = joblib.load("fraud_detection_model.pkl")
