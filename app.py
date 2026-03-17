@@ -55,7 +55,7 @@ def send_fraud_alert(record, receiver_email):
 
         # Safe email sending with exception handling
         try:
-            with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+            with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout = 5 ) as server:
                 server.login(EMAIL_USER, EMAIL_PASS)
                 server.sendmail(EMAIL_USER, receiver_email, msg.as_string())
             return True
