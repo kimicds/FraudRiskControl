@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="page-card mt-3">
+<h2 class="section-title text-center">Transaction Result</h2>
+
+<div class="text-center mb-3">
+<span class="badge fs-4 p-3 {% if result=='Fraud' %}bg-danger{% else %}bg-success{% endif %}">
+{{ result }}
+</span>
+</div>
+
+{% if alert_message %}
+<div class="alert alert-warning text-center">
+{{ alert_message }}
+</div>
+{% endif %}
+
+<div class="page-card mt-4">
+<h5 class="mb-3">Transaction Overview</h5>
+
+<table class="table table-striped">
+<tr><th>Sender</th><td>{{ data.sender_account }}</td></tr>
+<tr><th>Receiver</th><td>{{ data.receiver_account }}</td></tr>
+<tr><th>Amount</th><td>₦{{ "{:,.2f}".format(data.transaction_amount) }}</td></tr>
+<tr><th>Type</th><td>{{ data.transaction_type }}</td></tr>
+<tr><th>Hour</th><td>{{ data.transaction_hour }}</td></tr>
+<tr><th>Sender Before</th><td>₦{{ "{:,.2f}".format(data.sender_balance_before) }}</td></tr>
+<tr><th>Sender After</th><td>₦{{ "{:,.2f}".format(data.origin_balance_after) }}</td></tr>
+<tr><th>Receiver Before</th><td>₦{{ "{:,.2f}".format(data.receiver_balance_before) }}</td></tr>
+<tr><th>Receiver After</th><td>₦{{ "{:,.2f}".format(data.destination_balance_after) }}</td></tr>
+<tr><th>Location</th><td>{{ data.sender_location }}</td></tr>
+</table>
+</div>
+
+<div class="text-center mt-4">
+<a href="{{ url_for('data_entry') }}" class="btn btn-primary btn-lg">New Transaction</a>
+</div>
+
+</div>
+
+{% endblock %}
